@@ -1,0 +1,9 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".*\\.[^\\s.]*test[^\\s.]*\\.ts$",
+  "transform": { "^.+\\.(t|j)s$": "ts-jest" },
+  "transformIgnorePatterns": ["/node_modules/(?!(@langchain)/)"],
+  "globalSetup": "<rootDir>/jest-e2e-setup.ts"
+}
