@@ -5,6 +5,7 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "workspaces": ["app-client"],
   "scripts": {
     "build": "npm run build:client && nest build",
     "build:client": "cd app-client && npm run build",
