@@ -2,7 +2,7 @@ services:
   - type: web
     runtime: node
     name: dextr-deepagent-poc
-    buildCommand: npm install --production=false && npm install --prefix app-client --production=false && npm run build
+    buildCommand: npm install --production=false && (cd app-client && npm install --production=false) && npm run build
     preDeployCommand: npm run migrate
     startCommand: npm run start:prod
     envVars:
