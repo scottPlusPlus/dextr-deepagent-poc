@@ -58,3 +58,14 @@ export async function conversationEventsDbLastThreadIds(
   const result: string[] = rows.map((r) => r.thread_id as string);
   return result;
 }
+
+export async function conversationEventsDbThreadIdsSince(
+  since: Date,
+): Promise<string[]> {
+  const knex = getKnex();
+  const rows = await knex('conversation_events')
+    .select('thread_id')
+    .where('created_at', '>=', since)
+    .distinct();
+  return rows.map((r) => r.thread_id as string);
+}

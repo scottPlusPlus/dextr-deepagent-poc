@@ -9,6 +9,9 @@ import type { AgentConfig } from './lib/agents-types';
 import { createPostgresLlmCache } from './lib/llm-cache-postgres';
 import { ENV_IS_PROD } from './lib/system-utils';
 import { BaseCache } from '@langchain/core/caches';
+import { agentCache, clearAgentCache } from './lib/agent-cache';
+
+export { clearAgentCache };
 
 const targetModel: OpenAIChatModelId = 'gpt-5-mini';
 const STALE_TTL_MS = 5 * 60 * 1000; // 5 minutes
@@ -17,13 +20,6 @@ const DEFAULT_AGENT_CONFIG: AgentConfig = {
   systemPrompt: '',
   toolIds: ['get_current_time', 'word_of_the_day'],
 };
-
-interface CacheEntry {
-  runnable: Runnable;
-  lastUsedAt: number;
-}
-
-const agentCache = new Map<string, CacheEntry>();
 const refreshInProgress = new Set<string>();
 
 function cacheKeyForAgentId(agentId: string | undefined): string {
@@ -106,9 +102,7 @@ export const __for_testing = {
   setShouldUseLlmCache(value: boolean | null): void {
     _llmCacheOverrideForTesting = value;
   },
-  clearAgentCache(): void {
-    agentCache.clear();
-  },
+  clearAgentCache,
 };
 
 function getOurLlmCache(): BaseCache | undefined {

@@ -2,6 +2,11 @@ import * as crypto from 'crypto';
 import { resolveLangxAgent } from './agent';
 import { EventLoggingHandler } from './callbacks/event-logging-handler';
 import { agentsDbGetById } from './lib/agents-db';
+import { tokensInLastHour } from './lib/recent-token-usage';
+
+const TOKEN_LIMIT_THRESHOLD = 850_000; //approx $10 of GPT 4.1 tokens
+const TOKEN_LIMIT_MESSAGE =
+  'Token usage in the last hour has exceeded the limit. Please try again later.';
 
 export interface SendMessageInput {
   userId: string;
@@ -50,6 +55,16 @@ export async function* streamMessage(
     agentHash,
   );
   await eventHandler.logUserMessage(input.message);
+
+  const tokensUsed = await tokensInLastHour();
+  if (tokensUsed >= TOKEN_LIMIT_THRESHOLD) {
+    if (!input.threadId?.trim()) {
+      yield { threadId: effectiveThreadId };
+    }
+    yield { chunk: TOKEN_LIMIT_MESSAGE };
+    await eventHandler.logAgentMessage(TOKEN_LIMIT_MESSAGE);
+    return;
+  }
 
   const langxAgent = await resolveLangxAgent(input.agentId);
   const streamOptions = {

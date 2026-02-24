@@ -1,8 +1,7 @@
 import type { ConversationEventType } from './conversation-events-types';
 import { conversationEventsDbInsert } from './conversation-events-db';
 import { JsonObject } from './utils-agnostic/json-utils';
-import { ENV_IS_PROD } from './system-utils';
-import { truncateString } from './utils-agnostic/string-utils';
+
 
 export interface LogConversationEventInput {
   threadId: string;

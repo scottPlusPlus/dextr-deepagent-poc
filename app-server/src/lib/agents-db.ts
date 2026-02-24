@@ -1,4 +1,5 @@
 import * as crypto from 'crypto';
+import { clearAgentCache } from './agent-cache';
 import { getKnex } from './knex-instance-db';
 import type {
   Agent,
@@ -48,6 +49,7 @@ export async function agentsDbInsert(row: AgentInsertRow): Promise<Agent> {
     .insert(insertPayload)
     .returning(['id', 'hash', 'name', 'config']);
   const r = result[0] as { id: string; hash: string; name: string; config: unknown };
+  clearAgentCache();
   return rowToAgent(r);
 }
 
@@ -82,6 +84,7 @@ export async function agentsDbUpdate(
     .update(updatePayload)
     .returning(['id', 'hash', 'name', 'config']);
   const r = result[0] as { id: string; hash: string; name: string; config: unknown };
+  clearAgentCache();
   return rowToAgent(r);
 }
 
