@@ -15,7 +15,7 @@ const EXTRACT_PROMPT_CONTEXT_LENGTH_DESCR =
   'Chars of context before/after extract_prompt_query match. Use ~200 for focused excerpts.';
 
 const EXTRACT_PROMPT_DESCRIPTION_SUFFIX =
-  'When you need specific info from system prompts (e.g. check-out times), use extract_prompt_query with comma-separated variants like "checkout, check-out" and extract_prompt_context_length to filter and trim. This avoids large responses and extra tool calls.';
+  'When you need specific info from system prompts (e.g. check-out times), use extract_prompt_query with comma-separated variants like "checkout, check-out" and extract_prompt_context_length to filter and trim. This avoids large responses and extra tool calls. If you dont need the system prompt AT ALL, pass in something like xxxxx which will not match anything';
 
 const extractPromptSchemaFields = {
   extract_prompt_query: z.string().optional().describe(EXTRACT_PROMPT_QUERY_DESCR),

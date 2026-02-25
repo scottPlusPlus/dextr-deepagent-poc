@@ -10,6 +10,7 @@ import { llmDirectChat } from './llm-api-direct';
 import type { PreviousMessage } from './llm-api-direct';
 import { sendMessage } from '../../send-message';
 import type { Agent } from '../agents-types';
+import { DEFAULT_MESSAGE_HISTORY_CONFIG } from '../message-history-types';
 
 jest.mock('../agents-db', () => getAgentsDbMockFactory()());
 const agentsMock = setupMockedAgentsDb();
@@ -32,6 +33,7 @@ function createSpeedTestAgent(): Agent {
     config: {
       systemPrompt: SYSTEM_PROMPT,
       toolIds: [],
+      messageHistory: DEFAULT_MESSAGE_HISTORY_CONFIG,
     },
   };
   return agent;

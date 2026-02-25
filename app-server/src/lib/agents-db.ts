@@ -7,6 +7,10 @@ import type {
   AgentInsertRow,
   AgentUpdateRow,
 } from './agents-types';
+import {
+  DEFAULT_MESSAGE_HISTORY_CONFIG,
+  parseMessageHistoryConfig,
+} from './message-history-types';
 
 function rowToAgent(row: {
   id: string;
@@ -16,10 +20,12 @@ function rowToAgent(row: {
 }): Agent {
   const config =
     typeof row.config === 'string' ? JSON.parse(row.config) : row.config;
+  const raw = config as { systemPrompt?: unknown; toolIds?: unknown; messageHistory?: unknown };
+  const mh = parseMessageHistoryConfig(raw.messageHistory);
   const typedConfig: AgentConfig = {
-    systemPrompt: config.systemPrompt ?? '',
-    toolIds: Array.isArray(config.toolIds) ? config.toolIds : [],
-    messageHistory: config.messageHistory,
+    systemPrompt: (raw.systemPrompt as string) ?? '',
+    toolIds: Array.isArray(raw.toolIds) ? (raw.toolIds as string[]) : [],
+    messageHistory: mh ?? DEFAULT_MESSAGE_HISTORY_CONFIG,
   };
   const result: Agent = {
     id: row.id,
@@ -39,11 +45,15 @@ export async function agentsDbGetById(id: string): Promise<Agent | null> {
 
 export async function agentsDbInsert(row: AgentInsertRow): Promise<Agent> {
   const knex = getKnex();
+  const config: AgentConfig = {
+    ...row.config,
+    messageHistory: row.config.messageHistory ?? DEFAULT_MESSAGE_HISTORY_CONFIG,
+  };
   const insertPayload = {
     id: row.id,
     hash: row.hash,
     name: row.name,
-    config: JSON.stringify(row.config),
+    config: JSON.stringify(config),
   };
   const result = await knex('agents')
     .insert(insertPayload)
@@ -74,10 +84,14 @@ export async function agentsDbUpdate(
   row: AgentUpdateRow,
 ): Promise<Agent> {
   const knex = getKnex();
+  const config: AgentConfig = {
+    ...row.config,
+    messageHistory: row.config.messageHistory ?? DEFAULT_MESSAGE_HISTORY_CONFIG,
+  };
   const updatePayload = {
     hash: row.hash,
     name: row.name,
-    config: JSON.stringify(row.config),
+    config: JSON.stringify(config),
   };
   const result = await knex('agents')
     .where('id', id)

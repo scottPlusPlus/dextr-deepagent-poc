@@ -1,32 +1,31 @@
-import type { Agent } from '../agents-types';
+import type { Agent, AgentRuntime } from '../agents-types';
 
 export type LazyAgent = {
   id: string;
-  create: () => Agent | Promise<Agent>;
+  create: () => Agent | AgentRuntime | Promise<Agent | AgentRuntime>;
 };
 
-export type AgentOrLazy = Agent | LazyAgent;
+export type AgentOrLazy = Agent | AgentRuntime | LazyAgent;
 
 const agentsById = new Map<string, AgentOrLazy>();
 
 const mockGetById = jest.fn().mockImplementation(
-  async (id: string): Promise<Agent | null> => {
+  async (id: string): Promise<Agent | AgentRuntime | null> => {
     const entry = agentsById.get(id);
     if (entry == null) {
       return null;
     }
     if ('create' in entry && typeof entry.create === 'function') {
-      const agent = await Promise.resolve(entry.create());
-      return agent;
+      return Promise.resolve(entry.create());
     }
-    return entry as Agent;
+    return entry as Agent | AgentRuntime;
   },
 );
 
 export type MockedAgentsDbHook = {
   setup: (agents: AgentOrLazy[]) => void;
   getMock: () => jest.MockedFunction<
-    (id: string) => Promise<Agent | null>
+    (id: string) => Promise<Agent | AgentRuntime | null>
   >;
 };
 

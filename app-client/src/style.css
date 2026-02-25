@@ -582,3 +582,39 @@ body {
 .agents-delete-btn:hover {
   background: rgba(248, 81, 73, 0.2);
 }
+
+.agents-tools-section {
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #30363d;
+}
+
+.agents-tools-section h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.95rem;
+  color: #8b949e;
+}
+
+.agents-tools-ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.agents-tools-ul li {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.agents-tools-ul code {
+  font-size: 0.85rem;
+  color: #58a6ff;
+  flex-shrink: 0;
+}
+
+.agents-tools-desc {
+  font-size: 0.85rem;
+  color: #8b949e;
+}

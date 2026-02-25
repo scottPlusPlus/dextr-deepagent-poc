@@ -1,5 +1,6 @@
 import type { StructuredTool } from '@langchain/core/tools';
 import { getCurrentTimeTool } from '../tools/get-current-time';
+import { recentTokenUsageTool } from '../tools/recent-token-usage';
 import { wordOfTheDayTool } from '../tools/word-of-the-day';
 import { createQueryHotelAvailabilityTool } from '../tools/query-hotel-availability';
 import {
@@ -23,6 +24,7 @@ type ToolEntry = StructuredTool | ((agentId: string) => StructuredTool);
  */
 const TOOL_REGISTRY: Record<string, ToolEntry> = {
   get_current_time: getCurrentTimeTool,
+  recent_token_usage: recentTokenUsageTool,
   word_of_the_day: wordOfTheDayTool,
   query_hotel_availability: createQueryHotelAvailabilityTool,
   [VAPI_TOOL_GET_ASSISTANT_BY_NAME_OR_ID]: getAssistantByNameOrIdTool,
@@ -31,6 +33,24 @@ const TOOL_REGISTRY: Record<string, ToolEntry> = {
   [VAPI_TOOL_GET_ASSISTANT_PROD_DEV_MISMATCH]: getAssistantProdDevMismatchTool,
   [VAPI_TOOL_LIST_ALL_ASSISTANTS]: listAllAssistantsTool,
 };
+
+export interface ToolMetadata {
+  id: string;
+  description: string;
+}
+
+export function listToolsMetadata(): ToolMetadata[] {
+  const result: ToolMetadata[] = [];
+  for (const [id, entry] of Object.entries(TOOL_REGISTRY)) {
+    const t =
+      typeof entry === 'function' ? entry('') : entry;
+    result.push({
+      id: t.name,
+      description: t.description,
+    });
+  }
+  return result;
+}
 
 export function getToolsByIds(
   toolIds: string[],

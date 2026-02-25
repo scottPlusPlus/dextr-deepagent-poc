@@ -1,16 +1,20 @@
 import type { MessageHistoryOptions } from '../langx/message-history-middleware';
+import type { MessageHistoryConfig } from './message-history-types';
 
 /**
  * Application-defined agent config shape.
- * Stored as JSONB in DB; this type is used by the server layer.
- * messageHistory may include customTransform for programmatic/test agents;
- * DB-stored config uses only JSON-serializable fields (maxMessages, summarizeWhenOver).
+ * Stored as JSONB in DB; JSON-serializable only (maxMessages, summarizeWhenOver).
+ * Runtime-only options (e.g. customTransform) live in AgentConfigRuntime.
  */
 export interface AgentConfig {
   systemPrompt: string;
   toolIds: string[];
-  messageHistory?: MessageHistoryOptions;
+  messageHistory: MessageHistoryConfig;
 }
+
+export type AgentConfigRuntime = AgentConfig & {
+  messageHistory: MessageHistoryOptions;
+};
 
 export interface Agent {
   id: string;
@@ -18,6 +22,12 @@ export interface Agent {
   name: string;
   config: AgentConfig;
 }
+
+export interface AgentRuntime extends Omit<Agent, 'config'> {
+  config: AgentConfigRuntime;
+}
+
+export type AgentOrRuntime = Agent | AgentRuntime;
 
 export interface AgentInsertRow {
   id: string;

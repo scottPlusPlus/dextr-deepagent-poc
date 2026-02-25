@@ -11,7 +11,7 @@ import {
   logTimingStats,
 } from './lib/test-helpers/conversation-timing';
 import { sendMessage } from './send-message';
-import type { Agent } from './lib/agents-types';
+import type { Agent, AgentRuntime } from './lib/agents-types';
 
 jest.mock('./lib/agents-db', () => getAgentsDbMockFactory()());
 const agentsMock = setupMockedAgentsDb();
@@ -71,7 +71,7 @@ function createSummarizerAgent(): Agent {
   return agent;
 }
 
-function createReplaceAgent(): Agent {
+function createReplaceAgent(): AgentRuntime {
   const replacementMap: Record<string, string> = Object.fromEntries(
     SECRET_WORDS.map((w, i) => [w, REPLACED_WORDS[i]]),
   );
@@ -96,7 +96,7 @@ function createReplaceAgent(): Agent {
     return content;
   }
 
-  const agent: Agent = {
+  const agent: AgentRuntime = {
     id: REPLACE_AGENT_ID,
     hash: 'replace-hash',
     name: 'Replace Context',

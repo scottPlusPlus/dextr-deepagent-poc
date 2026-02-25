@@ -12,6 +12,10 @@ import {
   computeAgentHash,
 } from '../lib/agents-db';
 import type { Agent, AgentConfig } from '../lib/agents-types';
+import {
+  DEFAULT_MESSAGE_HISTORY_CONFIG,
+  parseMessageHistoryConfig,
+} from '../lib/message-history-types';
 
 export interface CreateAgentDto {
   id: string;
@@ -40,16 +44,19 @@ function validateAgentId(id: string): string {
 }
 
 function parseConfig(raw: string | AgentConfig): AgentConfig {
-  if (typeof raw === 'object' && raw !== null) {
-    const c = raw as { systemPrompt?: unknown; toolIds?: unknown };
-    const result: AgentConfig = {
-      systemPrompt: typeof c.systemPrompt === 'string' ? c.systemPrompt : '',
-      toolIds: Array.isArray(c.toolIds)
-        ? (c.toolIds as string[]).filter((x) => typeof x === 'string')
-        : [],
-    };
-    return result;
-  }
+  const c = toConfigObject(raw);
+  const mh = parseMessageHistoryConfig(c.messageHistory);
+  return {
+    systemPrompt: typeof c.systemPrompt === 'string' ? c.systemPrompt : '',
+    toolIds: Array.isArray(c.toolIds)
+      ? (c.toolIds as string[]).filter((x) => typeof x === 'string')
+      : [],
+    messageHistory: mh ?? DEFAULT_MESSAGE_HISTORY_CONFIG,
+  };
+}
+
+function toConfigObject(raw: string | AgentConfig): Record<string, unknown> {
+  if (typeof raw === 'object' && raw !== null) return raw as unknown as Record<string, unknown>;
   if (typeof raw !== 'string') {
     throw new BadRequestException('config must be a JSON string or object');
   }
@@ -62,14 +69,7 @@ function parseConfig(raw: string | AgentConfig): AgentConfig {
   if (parsed == null || typeof parsed !== 'object') {
     throw new BadRequestException('config must be a JSON object');
   }
-  const c = parsed as { systemPrompt?: unknown; toolIds?: unknown };
-  const result: AgentConfig = {
-    systemPrompt: typeof c.systemPrompt === 'string' ? c.systemPrompt : '',
-    toolIds: Array.isArray(c.toolIds)
-      ? (c.toolIds as string[]).filter((x) => typeof x === 'string')
-      : [],
-  };
-  return result;
+  return parsed as Record<string, unknown>;
 }
 
 @Injectable()

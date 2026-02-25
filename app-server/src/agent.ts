@@ -5,7 +5,12 @@ import { createCheckpointer } from './langx/checkpointer-instance';
 import { createMessageHistoryMiddleware } from './langx/message-history-middleware';
 import { getToolsByIds } from './lib/tool-registry';
 import { agentsDbGetById } from './lib/agents-db';
-import type { AgentConfig } from './lib/agents-types';
+import type {
+  AgentConfig,
+  AgentConfigRuntime,
+  AgentOrRuntime,
+} from './lib/agents-types';
+import { DEFAULT_MESSAGE_HISTORY_CONFIG } from './lib/message-history-types';
 import { createPostgresLlmCache } from './lib/llm-cache-postgres';
 import { ENV_IS_PROD } from './lib/system-utils';
 import { BaseCache } from '@langchain/core/caches';
@@ -19,6 +24,7 @@ const STALE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const DEFAULT_AGENT_CONFIG: AgentConfig = {
   systemPrompt: '',
   toolIds: ['get_current_time', 'word_of_the_day'],
+  messageHistory: DEFAULT_MESSAGE_HISTORY_CONFIG,
 };
 const refreshInProgress = new Set<string>();
 
@@ -70,10 +76,9 @@ async function buildLangxAgent(agentId?: string): Promise<Runnable> {
   const agentConfig = await resolveAgentConfig(agentId);
   const checkpointer = createCheckpointer();
   const tools = getToolsByIds(agentConfig.toolIds, agentId);
-  const messageHistoryOpts = agentConfig.messageHistory;
-  const middleware = messageHistoryOpts
-    ? [createMessageHistoryMiddleware(messageHistoryOpts)]
-    : undefined;
+  const middleware = [
+    createMessageHistoryMiddleware(agentConfig.messageHistory),
+  ];
   const runnable = createDeepAgent({
     model: new ChatOpenAI({
       model: targetModel,
@@ -109,9 +114,11 @@ function getOurLlmCache(): BaseCache | undefined {
   return shouldUseLlmCache() ? createPostgresLlmCache() : undefined;
 }
 
-async function resolveAgentConfig(agentId?: string): Promise<AgentConfig> {
+async function resolveAgentConfig(
+  agentId?: string,
+): Promise<AgentConfigRuntime> {
   if (!agentId) return DEFAULT_AGENT_CONFIG;
-  const agent = await agentsDbGetById(agentId);
+  const agent = (await agentsDbGetById(agentId)) as AgentOrRuntime | null;
   if (!agent) return DEFAULT_AGENT_CONFIG;
   return agent.config;
 }

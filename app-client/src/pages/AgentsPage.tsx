@@ -7,10 +7,16 @@ interface Agent {
   config: { systemPrompt: string; toolIds: string[] };
 }
 
+interface ToolMetadata {
+  id: string;
+  description: string;
+}
+
 type Mode = 'list' | 'add' | 'edit';
 
 function AgentsPage() {
   const [agents, setAgents] = useState<Agent[]>([]);
+  const [tools, setTools] = useState<ToolMetadata[]>([]);
   const [mode, setMode] = useState<Mode>('list');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState('');
@@ -33,6 +39,18 @@ function AgentsPage() {
         });
     },
     [mode],
+  );
+
+  useEffect(
+    function fetchTools() {
+      fetch('/api/tools')
+        .then((res) => res.json())
+        .then((data: ToolMetadata[]) => {
+          setTools(Array.isArray(data) ? data : []);
+        })
+        .catch(() => setTools([]));
+    },
+    [],
   );
 
   function validateConfig(): boolean {
@@ -202,6 +220,19 @@ function AgentsPage() {
             {loading ? 'Saving...' : 'Save'}
           </button>
         </div>
+        {tools.length > 0 && (
+          <div className="agents-tools-section">
+            <h3>Available tools</h3>
+            <ul className="agents-tools-ul">
+              {tools.map((t) => (
+                <li key={t.id}>
+                  <code>{t.id}</code>
+                  <span className="agents-tools-desc">{t.description}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     );
   }
