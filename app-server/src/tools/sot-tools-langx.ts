@@ -31,17 +31,23 @@ export const sotQueryTool = tool(
 );
 
 export const sotUpdateTool = tool(
-  async (args: { property_id: string; change_request: string }) => {
-    const result = await sotUpdate(args.property_id, args.change_request);
+  async (args: { property_id: string; change_request: string; branch_name?: string }) => {
+    const result = await sotUpdate(args.property_id, args.change_request, args.branch_name);
     return formatResult(result);
   },
   {
     name: SOT_TOOL_UPDATE,
     description:
-      'Sends a change request to the SoT for a property. Creates a branch artifact with the proposed changes and returns the result (name, hash, link). Does not apply the change; use sot_update_apply after review.',
+      'Sends a change request to the SoT for a property. Creates a branch artifact with the proposed changes and returns the result (name, hash, link). Does not apply the change; use sot_update_apply after review. When branch_name is provided, applies the change on top of that existing branch instead of creating a new one.',
     schema: z.object({
       property_id: z.string().describe('Property/location id (e.g. "benchmark-inn")'),
       change_request: z.string().describe('Description of the change to apply'),
+      branch_name: z
+        .string()
+        .optional()
+        .describe(
+          'Optional. When provided, applies the change on top of this existing branch instead of creating a new one.',
+        ),
     }),
   },
 );
@@ -54,7 +60,7 @@ export const sotUpdateApplyTool = tool(
   {
     name: SOT_TOOL_UPDATE_APPLY,
     description:
-      'Applies a branch artifact to the root SoT. The branch artifact is identified by its name (returned from sot_update, should include "_b_")',
+      'Applies a branch artifact to the root SoT. The branch artifact is identified by its name (returned from sot_update, should include "_b_").  Returns a link to the updated Source of Truth',
     schema: z.object({
       property_id: z.string().describe('Property/location id (e.g. "benchmark-inn")'),
       branch_name: z.string().describe('Branch artifact name (must contain "_b_")'),

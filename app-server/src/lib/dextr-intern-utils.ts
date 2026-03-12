@@ -11,6 +11,7 @@ function getAuthToken(): string {
 export async function dextrInternFetch(path: string): Promise<Response> {
   const token = getAuthToken();
   const url = `${DEXTR_INTERN_BASE_URL}${path}`;
+  console.log(`fetch get: ${url}`);
   return fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -25,6 +26,7 @@ export async function dextrInternPost(
 ): Promise<Response> {
   const token = getAuthToken();
   const url = `${DEXTR_INTERN_BASE_URL}${path}`;
+  console.log(`fetch post: ${url}`);
   return fetch(url, {
     method: 'POST',
     headers: {

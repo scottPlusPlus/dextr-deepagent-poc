@@ -47,12 +47,15 @@ export async function sotQuery(
 /**
  * Sends a change request to the SOT for a property. Creates a branch artifact
  * with the proposed changes and returns the result (name, hash, link).
+ * When branch_name is provided, applies the change on top of that existing branch.
  * @param property_id - Property/location slug (e.g. "benchmark-inn")
  * @param changeRequest - Description of the change to apply
+ * @param branch_name - Optional. When provided, applies the change on top of this existing branch instead of creating a new one.
  */
 export async function sotUpdate(
   property_id: string,
   changeRequest: string,
+  branch_name?: string,
 ): Promise<ResultOrHumanErr<JsonObject>> {
   console.debug(`sotUpdate: propertyId=${property_id}`);
   const trimmedPropertyId = property_id.trim();
@@ -63,11 +66,15 @@ export async function sotUpdate(
   if (!trimmedChange) {
     return { success: false, err: 'changeRequest is required' };
   }
+  const body: Record<string, string> = {
+    propertyId: trimmedPropertyId,
+    changeRequest: trimmedChange,
+  };
+  if (branch_name?.trim()) {
+    body.branchName = branch_name.trim();
+  }
   try {
-    const res = await dextrInternPost('/api/cos/sot_update', {
-      propertyId: trimmedPropertyId,
-      changeRequest: trimmedChange,
-    });
+    const res = await dextrInternPost('/api/cos/sot_update', body);
     if (!res.ok) {
       const text = await res.text();
       return { success: false, err: text || `HTTP ${res.status}` };
@@ -115,9 +122,8 @@ export async function sotUpdateApply(
       const text = await res.text();
       return { success: false, err: text || `HTTP ${res.status}` };
     }
-    const raw = await res.json();
-    const data = typeof raw === 'string' ? raw : String(raw ?? '');
-    return { success: true, data };
+    const text = await res.text();
+    return { success: true, data:text };
   } catch (e) {
     return {
       success: false,
