@@ -1,7 +1,6 @@
+import { dextrInternFetch } from '../dextr-intern-utils';
 import { toJsonObject, type JsonObject } from '../utils-agnostic/json-utils';
 import { findInStringWithContextMulti } from '../utils-agnostic/string-utils';
-
-const DEXTR_INTERN_BASE_URL = 'https://dextr-intern.onrender.com';
 
 export type ResultOrHumanErr<T> =
   | { success: true; data: T }
@@ -255,23 +254,4 @@ function parseJsonObjectArray(raw: unknown): ResultOrHumanErr<JsonObject[]> {
     }
   }
   return { success: true, data: result };
-}
-
-function getAuthToken(): string {
-  const token = process.env.DEXTR_INTERN_AUTH_TOKEN;
-  if (!token) {
-    throw new Error('DEXTR_INTERN_AUTH_TOKEN is not set');
-  }
-  return token;
-}
-
-async function dextrInternFetch(path: string): Promise<Response> {
-  const token = getAuthToken();
-  const url = `${DEXTR_INTERN_BASE_URL}${path}`;
-  return fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-  });
 }

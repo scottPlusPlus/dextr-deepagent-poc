@@ -15,6 +15,14 @@ import {
   getAssistantProdDevMismatchTool,
   listAllAssistantsTool,
 } from '../tools/vapi-tools-langx';
+import {
+  SOT_TOOL_QUERY,
+  SOT_TOOL_UPDATE,
+  SOT_TOOL_UPDATE_APPLY,
+  sotQueryTool,
+  sotUpdateApplyTool,
+  sotUpdateTool,
+} from '../tools/sot-tools-langx';
 
 type ToolEntry = StructuredTool | ((agentId: string) => StructuredTool);
 
@@ -32,6 +40,9 @@ const TOOL_REGISTRY: Record<string, ToolEntry> = {
   [VAPI_TOOL_GET_ASSISTANT_BY_SYSTEM_PROMPT]: getAssistantBySystemPromptTool,
   [VAPI_TOOL_GET_ASSISTANT_PROD_DEV_MISMATCH]: getAssistantProdDevMismatchTool,
   [VAPI_TOOL_LIST_ALL_ASSISTANTS]: listAllAssistantsTool,
+  [SOT_TOOL_QUERY]: sotQueryTool,
+  [SOT_TOOL_UPDATE]: sotUpdateTool,
+  [SOT_TOOL_UPDATE_APPLY]: sotUpdateApplyTool,
 };
 
 export interface ToolMetadata {
