@@ -5,7 +5,7 @@ import {
   parseMessageHistoryConfig,
 } from './message-history-types';
 
-/** Response shape from dextr-intern /api/artifacts/resolve-dextr-agent and /api/artifacts/dextr-agents */
+/** Response shape from dextr-intern /api/dextr-agent/resolve-dextr-agent and /api/dextr-agent/dextr-agents */
 interface DextrAgentResponse {
   name: string;
   systemPrompt: string;
@@ -57,7 +57,7 @@ function computeHashFromConfig(name: string, config: AgentConfig): string {
 export async function fetchAgentById(id: string): Promise<Agent | null> {
   const baseUrl = getBaseUrl();
   const token = getAuthToken();
-  const url = `${baseUrl}/api/artifacts/resolve-dextr-agent?id=${encodeURIComponent(id)}`;
+  const url = `${baseUrl}/api/dextr-agent/resolve-dextr-agent?id=${encodeURIComponent(id)}`;
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -74,7 +74,7 @@ export async function fetchAgentsList(limit?: number): Promise<Agent[]> {
   const baseUrl = getBaseUrl();
   const token = getAuthToken();
   const limitParam = limit != null ? `limit=${limit}` : '';
-  const url = `${baseUrl}/api/artifacts/dextr-agents${limitParam ? `?${limitParam}` : ''}`;
+  const url = `${baseUrl}/api/dextr-agent/dextr-agents${limitParam ? `?${limitParam}` : ''}`;
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
