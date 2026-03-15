@@ -33,9 +33,8 @@ export async function sotQuery(
       const text = await res.text();
       return { success: false, err: text || `HTTP ${res.status}` };
     }
-    const raw = await res.json();
-    const data = typeof raw === 'string' ? raw : String(raw ?? '');
-    return { success: true, data };
+    const text = await res.text();
+    return { success: true, data: text };
   } catch (e) {
     return {
       success: false,

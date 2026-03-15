@@ -28,16 +28,3 @@ export interface AgentRuntime extends Omit<Agent, 'config'> {
 }
 
 export type AgentOrRuntime = Agent | AgentRuntime;
-
-export interface AgentInsertRow {
-  id: string;
-  hash: string;
-  name: string;
-  config: AgentConfig;
-}
-
-export interface AgentUpdateRow {
-  hash: string;
-  name: string;
-  config: AgentConfig;
-}

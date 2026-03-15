@@ -15,7 +15,6 @@ const NAV_ITEMS: { path: string; label: string }[] = [
   { path: '/', label: 'Chat' },
   { path: '/log', label: 'Log' },
   { path: '/history', label: 'History' },
-  { path: '/agents', label: 'Agents' },
 ];
 
 function Sidebar(props: SidebarProps): JSX.Element {

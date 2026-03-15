@@ -5,7 +5,6 @@ import Sidebar from './Sidebar';
 import ChatPage from './pages/ChatPage';
 import LogPage from './pages/LogPage';
 import HistoryPage from './pages/HistoryPage';
-import AgentsPage from './pages/AgentsPage';
 import './style.css';
 
 function App(): JSX.Element {
@@ -50,7 +49,6 @@ function App(): JSX.Element {
           />
           <Route path="/log" element={<LogPage />} />
           <Route path="/history" element={<HistoryPage />} />
-          <Route path="/agents" element={<AgentsPage />} />
         </Routes>
       </main>
     </div>
